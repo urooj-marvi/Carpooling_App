@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
+
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -23,6 +24,9 @@
         tools:targetApi="31">
 
 
+        <activity
+            android:name=".passengerui.activity.ViewDriverProfile"
+            android:exported="false" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -59,7 +63,8 @@
         <activity
             android:name=".driverui.activities.DriverRegister"
             android:exported="false" />
-       <activity android:name=".driverui.activities.LoginDriver"
+        <activity
+            android:name=".driverui.activities.LoginDriver"
             android:exported="true" />
         <activity
             android:name=".passengerui.activity.PassengerActivity"
@@ -68,6 +73,15 @@
             android:name=".driverui.activities.MainActivity"
             android:exported="true"
             android:label="@string/app_name" />
+
+
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

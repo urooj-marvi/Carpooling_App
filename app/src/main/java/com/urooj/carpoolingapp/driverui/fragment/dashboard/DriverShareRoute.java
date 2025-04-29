@@ -34,6 +34,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -224,7 +225,7 @@ public class DriverShareRoute extends Fragment {
         focusLocationBtn = view.findViewById(R.id.focusLocation);
         setRoute = view.findViewById(R.id.setRoute);
         MaterialButton clearRouteButton = view.findViewById(R.id.clearRoute);
-        databaseReference = FirebaseDatabase.getInstance().getReference("Routes");
+        databaseReference = FirebaseDatabase.getInstance().getReference("driverRoutes");
 
         clearRouteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -353,21 +354,25 @@ public class DriverShareRoute extends Fragment {
         });
     }
     private void saveRouteToFirebase(Point origin, Point destination) {
-        String routeId = databaseReference.push().getKey(); // auto-generate a unique ID
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("driverRoutes");
+        String passengerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        if (passengerId == null) {
+            Log.e("FIREBASE", "User not authenticated. Cannot save route.");
+            return;
+        }
 
         Map<String, Object> routeData = new HashMap<>();
-        routeData.put("origin_latitude", origin.latitude());
-        routeData.put("origin_longitude", origin.longitude());
-        routeData.put("destination_latitude", destination.latitude());
-        routeData.put("destination_longitude", destination.longitude());
+        routeData.put("originLat", origin.latitude());
+        routeData.put("originLng", origin.longitude());
+        routeData.put("destinationLat", destination.latitude());
+        routeData.put("destinationLng", destination.longitude());
+        routeData.put("timestamp", ServerValue.TIMESTAMP); // Optional: track when the route was updated
 
-        databaseReference.child(routeId).setValue(routeData)
-                .addOnSuccessListener(unused -> {
-                    Toast.makeText(getContext(), "Route saved to Firebase", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to save route: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+        // This line will overwrite any existing route for this user
+        ref.child(passengerId).setValue(routeData)
+                .addOnSuccessListener(aVoid -> Log.d("FIREBASE", "Route updated successfully in Firebase"))
+                .addOnFailureListener(e -> Log.e("FIREBASE", "Failed to update route in Firebase", e));
     }
 
     private void updateCamera(Point point, Double bearing) {

@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "834640967386",
-    "firebase_url": "https://abm-carpoolingapp-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "abm-carpoolingapp",
-    "storage_bucket": "abm-carpoolingapp.firebasestorage.app"
+    "project_number": "921625774231",
+    "project_id": "carpool-app-7dd80",
+    "storage_bucket": "carpool-app-7dd80.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:834640967386:android:306917f18fba7e7d6e17e3",
+        "mobilesdk_app_id": "1:921625774231:android:c6d5aeeb3c6585990881d2",
         "android_client_info": {
           "package_name": "com.urooj.carpoolingapp"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCmDYuVaEg4aFcVrI9bV0RXD8V4wnlG1dE"
+          "current_key": "AIzaSyBET5NrYAKLPLy2Ac1kRfVRll3tYeZgJAM"
         }
       ],
       "services": {

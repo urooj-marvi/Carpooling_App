@@ -7,6 +7,7 @@ import static com.mapbox.maps.plugin.locationcomponent.LocationComponentUtils.ge
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,11 +29,15 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -52,6 +57,8 @@ import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor;
 import com.mapbox.maps.plugin.animation.MapAnimationOptions;
 import com.mapbox.maps.plugin.annotation.AnnotationPlugin;
 import com.mapbox.maps.plugin.annotation.AnnotationPluginImplKt;
+import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener;
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation;
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager;
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManagerKt;
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions;
@@ -88,10 +95,14 @@ import com.mapbox.navigation.ui.voice.model.SpeechValue;
 import com.mapbox.navigation.ui.voice.model.SpeechVolume;
 import com.mapbox.navigation.ui.voice.view.MapboxSoundButton;
 import com.urooj.carpoolingapp.R;
+import com.urooj.carpoolingapp.passengerui.activity.ViewDriverProfile;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import kotlin.Unit;
@@ -121,62 +132,82 @@ public class SharedRideFragment extends Fragment {
         public void onNewLocationMatcherResult(@NonNull LocationMatcherResult locationMatcherResult) {
             Location location = locationMatcherResult.getEnhancedLocation();
             navigationLocationProvider.changePosition(location, locationMatcherResult.getKeyPoints(), null, null);
+
             if (focusLocation) {
                 updateCamera(Point.fromLngLat(location.getLongitude(), location.getLatitude()), (double) location.getBearing());
             }
+
+            // Upload passenger location to Firebase
+            updatePassengerLocationToFirebase(location);
         }
+
+
     };
 
     private final RoutesObserver routesObserver = new RoutesObserver() {
         @Override
         public void onRoutesChanged(@NonNull RoutesUpdatedResult routesUpdatedResult) {
             routeLineApi.setNavigationRoutes(routesUpdatedResult.getNavigationRoutes(),
-                    new MapboxNavigationConsumer<Expected<RouteLineError, RouteSetValue>>() {
-                        @Override
-                        public void accept(Expected<RouteLineError, RouteSetValue> routeLineErrorRouteSetValueExpected) {
-                            mapView.getMapboxMap().getStyle(new Style.OnStyleLoaded() {
-                                @Override
-                                public void onStyleLoaded(@NonNull Style style) {
-                                    routeLineView.renderRouteDrawData(style, routeLineErrorRouteSetValueExpected);
-                                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.driver_car);
-                                    AnnotationPlugin annotationPlugin = AnnotationPluginImplKt.getAnnotations(mapView);
-                                    pointAnnotationManager = PointAnnotationManagerKt.createPointAnnotationManager(annotationPlugin, mapView);
+                    routeLineErrorRouteSetValueExpected -> mapView.getMapboxMap().getStyle(style -> {
+                        routeLineView.renderRouteDrawData(style, routeLineErrorRouteSetValueExpected);
 
-                                    DatabaseReference driversRef = FirebaseDatabase.getInstance().getReference("driverShareLocation");
-
-                                    driversRef.addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            pointAnnotationManager.deleteAll(); // Clear previous markers
-
-                                            for (DataSnapshot driverSnap : snapshot.getChildren()) {
-                                                double lat = driverSnap.child("latitude").getValue(Double.class);
-                                                double lon = driverSnap.child("longitude").getValue(Double.class);
-                                                String driverName = driverSnap.child("name").getValue(String.class);
-
-
-                                                PointAnnotationOptions driverMarker = new PointAnnotationOptions()
-                                                        .withPoint(Point.fromLngLat(lon, lat))
-                                                        .withTextField(driverName)
-                                                        .withTextSize(12.0)
-                                                        .withIconImage(bitmap); // You can use a custom icon
-
-                                                pointAnnotationManager.create(driverMarker);
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-                                            Log.e("FIREBASE_ERROR", error.getMessage());
-                                        }
-                                    });
-
+                        // Load driver locations from Firebase
+                        DatabaseReference driversRef = FirebaseDatabase.getInstance().getReference("driverShareLocation");
+                        driversRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (pointAnnotationManager != null) {
+                                    pointAnnotationManager.deleteAll(); // Clear old markers
                                 }
-                            });
-                        }
-                    });
+
+                                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.driver_car);
+
+                                // Get current location
+                                Location currentLocation = navigationLocationProvider.getLastLocation();
+                                if (currentLocation == null) {
+                                    Toast.makeText(getContext(), "Current location not available", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                double currentLat = currentLocation.getLatitude();
+                                double currentLng = currentLocation.getLongitude();
+
+                                for (DataSnapshot driverSnap : snapshot.getChildren()) {
+                                    double driverLat = driverSnap.child("latitude").getValue(Double.class);
+                                    double driverLng = driverSnap.child("longitude").getValue(Double.class);
+                                    String driverName = driverSnap.child("name").getValue(String.class);
+                                    String driverId = driverSnap.getKey();
+
+                                    double distance = calculateDistance(currentLat, currentLng, driverLat, driverLng);
+
+                                    if (distance <= 3.0) { // Only drivers within 3 km
+                                        PointAnnotationOptions driverMarker = new PointAnnotationOptions()
+                                                .withPoint(Point.fromLngLat(driverLng, driverLat))
+                                                .withTextField(driverName)
+                                                .withTextSize(12.0)
+                                                .withIconImage(bitmap)
+                                                .withData(new Gson().toJsonTree(driverId));
+
+                                        pointAnnotationManager.create(driverMarker);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Log.e("FIREBASE_ERROR", error.getMessage());
+                            }
+                        });
+
+                    }));
         }
     };
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        float[] results = new float[1];
+        Location.distanceBetween(lat1, lon1, lat2, lon2, results);
+        return results[0] / 1000.0; // Convert meters to kilometers
+    }
+
 
     private final OnMoveListener onMoveListener = new OnMoveListener() {
         @Override
@@ -253,6 +284,15 @@ public class SharedRideFragment extends Fragment {
         mapView = view.findViewById(R.id.mapView);
         focusLocationBtn = view.findViewById(R.id.focusLocation);
         setRoute = view.findViewById(R.id.setRoute);
+        MaterialButton clearRouteButton = view.findViewById(R.id.clearRoute);
+        clearRouteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mapboxNavigation.setNavigationRoutes(Collections.emptyList());
+                Toast.makeText(getContext(), "Route cleared", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
         MapboxRouteLineOptions options = new MapboxRouteLineOptions.Builder(requireContext())
                 .withRouteLineResources(new RouteLineResources.Builder().build())
@@ -328,8 +368,23 @@ public class SharedRideFragment extends Fragment {
 
                 Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.locationpin);
                 AnnotationPlugin annotationPlugin = AnnotationPluginImplKt.getAnnotations(mapView);
-                PointAnnotationManager pointAnnotationManager = PointAnnotationManagerKt.createPointAnnotationManager(annotationPlugin, mapView);
+                pointAnnotationManager = PointAnnotationManagerKt.createPointAnnotationManager(annotationPlugin, mapView);
 
+// Set up click listener ONCE
+                pointAnnotationManager.addClickListener(new OnPointAnnotationClickListener() {
+                    @Override
+                    public boolean onAnnotationClick(@NonNull PointAnnotation clickedAnnotation) {
+                        JsonElement data = clickedAnnotation.getData();
+                        if (data != null) {
+                            String driverId = new Gson().fromJson(data, String.class);
+                            Log.d("ANNOTATION_CLICK", "Driver ID clicked: " + driverId);
+
+                            openDriverProfile(driverId);
+                            return true;
+                        }
+                        return false;
+                    }
+                });
                 addOnMapClickListener(mapView.getMapboxMap(), new OnMapClickListener() {
                     @Override
                     public boolean onMapClick(@NonNull Point destinationPoint) {
@@ -372,6 +427,27 @@ public class SharedRideFragment extends Fragment {
             }
         });
     }
+    private void updatePassengerLocationToFirebase(Location location) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("rides");
+        String passengerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        Map<String, Object> passengerData = new HashMap<>();
+        passengerData.put("latitude", location.getLatitude());
+        passengerData.put("longitude", location.getLongitude());
+        passengerData.put("name", "Passenger");
+
+        ref.child(passengerId).setValue(passengerData)
+                .addOnSuccessListener(aVoid -> Log.d("FIREBASE", "Passenger location updated"))
+                .addOnFailureListener(e -> Log.e("FIREBASE", "Failed to update location", e));
+    }
+
+    private void openDriverProfile(String driverId) {
+        if (getActivity() != null) {
+            Intent intent = new Intent(getActivity(), ViewDriverProfile.class);
+            intent.putExtra("driverId", driverId);
+            startActivity(intent);
+        }
+    }
 
     private void updateCamera(Point point, Double bearing) {
         MapAnimationOptions animationOptions = new MapAnimationOptions.Builder().duration(1500L).build();
@@ -385,6 +461,8 @@ public class SharedRideFragment extends Fragment {
 
         getCamera(mapView).easeTo(cameraOptions, animationOptions);
     }
+
+
 
     @SuppressLint("MissingPermission")
     private void fetchRoute(Point originPoint, Point destinationPoint) {
@@ -413,6 +491,7 @@ public class SharedRideFragment extends Fragment {
             @Override
             public void onRoutesReady(@NonNull List<NavigationRoute> routes, @NonNull RouterOrigin routerOrigin) {
                 mapboxNavigation.setNavigationRoutes(routes);
+                saveRouteToFirebase(originPoint, destinationPoint);
                 focusLocationBtn.performClick();
                 setRoute.setEnabled(true);
                 setRoute.setText("Set route");
@@ -437,15 +516,62 @@ public class SharedRideFragment extends Fragment {
 
 
 
+    private void saveRouteToFirebase(Point origin, Point destination) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("passengerRoutes");
+        String passengerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        if (passengerId == null) {
+            Log.e("FIREBASE", "User not authenticated. Cannot save route.");
+            return;
+        }
+
+        Map<String, Object> routeData = new HashMap<>();
+        routeData.put("originLat", origin.latitude());
+        routeData.put("originLng", origin.longitude());
+        routeData.put("destinationLat", destination.latitude());
+        routeData.put("destinationLng", destination.longitude());
+        routeData.put("timestamp", ServerValue.TIMESTAMP); // Optional: track when the route was updated
+
+        // This line will overwrite any existing route for this user
+        ref.child(passengerId).setValue(routeData)
+                .addOnSuccessListener(aVoid -> Log.d("FIREBASE", "Route updated successfully in Firebase"))
+                .addOnFailureListener(e -> Log.e("FIREBASE", "Failed to update route in Firebase", e));
+    }
+
+
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mapboxNavigation.onDestroy();
-        mapboxNavigation.unregisterRoutesObserver(routesObserver);
-        mapboxNavigation.unregisterLocationObserver(locationObserver);
-        routeLineApi.cancel();
-        routeLineView.cancel();
-        mapboxVoiceInstructionsPlayer.shutdown();
-        speechApi.cancel();
+
+        // Cancel everything safely
+        if (mapboxNavigation != null) {
+            mapboxNavigation.unregisterRoutesObserver(routesObserver);
+            mapboxNavigation.unregisterLocationObserver(locationObserver);
+            mapboxNavigation.unregisterVoiceInstructionsObserver(voiceInstructionsObserver);
+
+            // Stop the trip session properly
+            mapboxNavigation.stopTripSession();
+
+            mapboxNavigation.onDestroy();
+        }
+
+        if (routeLineApi != null) {
+            routeLineApi.cancel();
+        }
+        if (routeLineView != null) {
+            routeLineView.cancel();
+        }
+        if (mapboxVoiceInstructionsPlayer != null) {
+            mapboxVoiceInstructionsPlayer.shutdown();
+        }
+        if (speechApi != null) {
+            speechApi.cancel();
+        }
+
+        if (pointAnnotationManager != null) {
+            pointAnnotationManager.deleteAll();
+        }
     }
 }

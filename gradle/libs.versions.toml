@@ -30,9 +30,11 @@ playServicesMaps = "19.0.0"
 playServicesMapsVersion = "18.0.0"
 retrofit = "2.9.0"
 sdk = "1.0.0"
+swiperefreshlayout = "1.1.0"
 ui = "2.5.0"
 volley = "1.2.1"
 googlePlayServicesMaps = "19.1.0"
+firebaseMessaging = "24.1.1"
 
 [libraries]
 android = { module = "com.mapbox.maps:android", version.ref = "android" }
@@ -66,9 +68,11 @@ play-services-maps = { group = "com.google.android.gms", name = "play-services-m
 play-services-maps-v1800 = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMapsVersion" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 sdk = { module = "pro.gomap:sdk", version.ref = "sdk" }
+swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 ui = { module = "com.mapbox.navigation:ui", version.ref = "ui" }
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
 gms-play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "googlePlayServicesMaps" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
