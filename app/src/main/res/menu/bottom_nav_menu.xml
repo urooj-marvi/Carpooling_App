@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_passengerdashboard"
+        android:icon="@drawable/home"
+        android:title="@string/title_PassengerRideDashboard" />
+
+    <item
+        android:id="@+id/navigation_passengernotifications"
+        android:icon="@drawable/ic_notifications_black_24dp"
+        android:title="@string/title_Passengernotification" />
+
+    <item
+        android:id="@+id/navigation_passengerlocation"
+        android:icon="@drawable/location"
+        android:title="@string/title_Passengerlocation" />
+
+    <item
+        android:id="@+id/navigation_passengerprofile"
+        android:icon="@drawable/profile"
+        android:title="@string/title_Passengerprofile" />
+</menu>

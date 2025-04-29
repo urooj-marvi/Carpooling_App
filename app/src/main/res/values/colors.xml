@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color> <!-- Darker Purple -->
+    <color name="colorPrimaryLight">#BB86FC</color> <!-- Light Purple -->
+
+    <color name="colorSecondary">#03DAC6</color> <!-- Teal -->
+    <color name="colorSecondaryDark">#018786</color> <!-- Dark Teal -->
+    <color name="colorBackground">#FFFFFF</color> <!-- White -->
+    <color name="colorSurface">#FFFFFF</color> <!-- White -->
+    <color name="colorOnPrimary">#000000</color> <!-- Black -->
+    <color name="colorOnSecondary">#FFFFFF</color> <!-- White -->
+    <color name="colorOnBackground">#000000</color> <!-- Black -->
+    <color name="colorOnSurface">#000000</color> <!-- Black -->
+    <color name="colorError">#B00020</color> <!-- Red -->
+
+    <color name="colorGray">#9E9E9E</color> <!-- Medium Gray -->
+    <color name="colorLightGray">#E0E0E0</color> <!-- Light Gray -->
+    <color name="colorDarkGray">#616161</color> <!-- Dark Gray -->
+    <color name="colorRoute">#6200EE</color> <!-- Deep Purple -->
+    <color name="colorHighlightedRoute">#03DAC6</color> <!-- Teal -->
+    <color name="colorButtonBackground">#6200EE</color> <!-- Deep Purple -->
+    <color name="colorButtonText">#FFFFFF</color> <!-- White -->
+    <color name="colorSuccess">#4CAF50</color> <!-- Green -->
+    <color name="colorWarning">#FFC107</color> <!-- Amber -->
+    <color name="bottom_nav_icon_color">#000000</color>
+    <color name="bottom_nav_text_color">#000000</color>
+
+    <color name="primary">#3F51B5</color>
+    <color name="primary_dark">#303F9F</color>
+    <color name="primary_light">#C5CAE9</color>
+    <color name="accent">#FF5722</color>
+    <color name="accent_light">#FFAB91</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="divider">#BDBDBD</color>
+    <color name="background">#F5F7FA</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FFC107</color>
+    <color name="error">#F44336</color>
+    <color name="profile_gradient_start">#3F51B5</color>
+    <color name="profile_gradient_center">#4552B5</color>
+    <color name="profile_gradient_end">#5C6BC0</color>
+    <color name="profile_button">#3949AB</color>
+    <color name="profile_button_pressed">#303F9F</color>
+</resources>

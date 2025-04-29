@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#04BDAC"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="cursive"
+            android:padding="16dp"
+            android:text="Choose Your Ride"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"/>
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Main Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_margin="10dp">
+
+        <!-- RadioGroup for selecting ride type -->
+        <RadioGroup
+            android:id="@+id/radioGroupRideType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/radioSharedRide"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="@string/shared_ride"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/radioPersonalRide"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:padding="12dp"
+                android:text="@string/personal_ride"
+                android:textSize="18sp" />
+
+        </RadioGroup>
+
+        <!-- Find Ride Button -->
+        <Button
+            android:id="@+id/btnFindRide"
+            android:layout_width="144dp"
+            android:layout_height="67dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:background="#198179"
+            android:padding="12dp"
+            android:text="Find Ride"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="10dp" />
+
+           </LinearLayout>
+
+</LinearLayout>

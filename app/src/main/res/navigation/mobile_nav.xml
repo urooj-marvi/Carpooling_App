@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/navigation_dashboard">
+
+    <fragment
+        android:id="@+id/navigation_passengerdashboard"
+        android:name="com.urooj.carpoolingapp.passengerui.fragment.dashbord.PassengerDashbordFragment"
+        android:label="@string/title_PassengerRideDashboard"
+        tools:layout="@layout/fragment_passenger_dashbord" >
+        <action
+            android:id="@+id/action_to_sharedRideFragment"
+            app:destination="@id/navigation_sharedRide" />
+        <action
+            android:id="@+id/action_to_personalRideFragment"
+            app:destination="@id/navigation_personalRide" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_passengernotifications"
+        android:name="com.urooj.carpoolingapp.passengerui.fragment.notification.NotificationFragment"
+        android:label="@string/title_notification"
+        tools:layout="@layout/fragment_notification"/>
+
+    <fragment
+        android:id="@+id/navigation_passengerlocation"
+        android:name="com.urooj.carpoolingapp.passengerui.fragment.location.LocationMapsFragment"
+        android:label="@string/title_location"
+        tools:layout="@layout/fragment_location_maps"/>
+
+    <fragment
+        android:id="@+id/navigation_passengerprofile"
+        android:name="com.urooj.carpoolingapp.passengerui.fragment.profile.PassengerEditProfile"
+        android:label="@string/title_profile"
+        tools:layout="@layout/fragment_passenger_profile" />
+
+    <fragment
+        android:id="@+id/navigation_sharedRide"
+        android:name="com.urooj.carpoolingapp.passengerui.fragment.SharedRideFragment"
+        android:label="Shared Ride"
+        tools:layout="@layout/fragment_shared_ride" />
+
+    <fragment
+        android:id="@+id/navigation_personalRide"
+        android:name="com.urooj.carpoolingapp.passengerui.fragment.PersonalRideFragment"
+        android:label="Personal Ride"
+        tools:layout="@layout/fragment_personal_ride" />
+
+    <fragment
+        android:id="@+id/bookingFragment"
+        android:name="com.urooj.carpoolingapp.passengerui.fragment.NewRideBooking"
+        android:label="Book a Ride"
+        tools:layout="@layout/fragment_new_ride_booking" />
+</navigation>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UserSelectionActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:padding="10dp">
+
+        <!-- Include the toolbar at the top -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#6A5ACD"
+            android:title="Welcome to Carpooling System"
+            android:titleTextColor="#FFFFFF">
+
+            <!-- Welcome screen content -->
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:fontFamily="cursive"
+                android:gravity="right|left"
+                android:text="User Selection Role"
+                android:textColor="@color/white"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+        </androidx.appcompat.widget.Toolbar>
+
+        <ImageView
+            android:id="@+id/backgroundImage"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginTop="55dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/background" />
+
+        <TextView
+            android:id="@+id/welcomeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/backgroundImage"
+            android:layout_marginTop="28dp"
+            android:fontFamily="serif"
+            android:gravity="center_horizontal"
+            android:text="Welcome to Carpooling App"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="30sp"
+            android:textStyle="bold|italic" />
+
+        <Button
+            android:id="@+id/btnDriver"
+            android:layout_width="222dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/welcomeText"
+            android:layout_marginStart="70dp"
+            android:layout_marginTop="40dp"
+            android:backgroundTint="#6A5ACD"
+            android:text="Register as a Driver"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/btnPassenger"
+            android:layout_width="231dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnDriver"
+            android:layout_marginStart="70dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#6A5ACD"
+            android:text="Register as a Passenger"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/subText"
+            android:layout_width="wrap_content"
+            android:layout_height="96dp"
+            android:layout_below="@id/btnPassenger"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="Connecting drivers and passengers for a seamless ride experience."
+            android:textColor="#555555"
+            android:textSize="14sp" />
+
+    </RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
