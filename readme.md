@@ -8,7 +8,7 @@ An Android-based carpooling application designed to bridge the gap between drive
 _Note : This is our Final Year Project for our B.E in Computer Systems Engineering._  
 
 ## Contributors : 
-_[UROOJ MARVI](https://github.com/urooj-marvi)_
+_[UROOJ MARVI](https://github.com/urooj-marvi)_ <br>
 _[ABDUL BASIT MEMON](https://github.com/abm1119)_
 ---
 
@@ -317,7 +317,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Urooj Marvi - uroojriaz048@gmail.com
+Urooj Marvi - uroojriaz048@gmail.com <br>
 Abdul Basit - basitmemon67@gmail.com
 
 
